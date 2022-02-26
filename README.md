@@ -1,0 +1,2 @@
+# hisabi
+Investment manager.
