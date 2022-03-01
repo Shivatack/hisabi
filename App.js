@@ -5,7 +5,7 @@ import { Login } from './components/login/Login';
 export default function App() {
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Project Assu</Text>
+            <Text style={styles.title}>Hisabi</Text>
             <Login />
             <StatusBar style="auto" />
         </View>
