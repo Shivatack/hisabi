@@ -12,11 +12,13 @@ export class Login extends React.Component {
 
     async onLoginPressed() {
         alert(this.state.email + "\n" + this.state.password);
+        this.props.navigation.navigate('Dashboard', {})
     }
 
     render() {
         return (
             <View style={styles.container}>
+                <Text style={styles.title}>Hisabi</Text>
                 <TextInput style={styles.textinput} placeholder='email@example.com' onChangeText={(email) => this.setState({ email: email })} />
                 <TextInput style={styles.textinput} secureTextEntry={true} placeholder='password' onChangeText={(password) => this.setState({ password: password })} />
                 <Button onPress={ () => this.onLoginPressed() } title='Login' />
@@ -32,9 +34,18 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         borderRadius: 10,
         margin: 5,
-        padding: 5
+        padding: 5,
+        minWidth: 300
     },
     container: {
-        minWidth: 300
+        flex: 1,
+        backgroundColor: 'black',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    title: {
+        color: 'white',
+        fontSize: 30,
+        marginBottom: 30
     }
 });
