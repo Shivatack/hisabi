@@ -103,8 +103,5 @@ dist
 # TernJS port file
 .tern-port
 
-# Config file with database credentials
-config.js
-
 # Expo
 .expo/*

@@ -1,28 +1,11 @@
-const express = require("express");
-const api = express();
-const port = 3030;
-const usersRouter = require("./routes/users");
+const http = require("http");
+const app = require("./app");
+const server = http.createServer(app);
 
-api.use(express.json());
-api.use(
-    express.urlencoded({
-        extended: true
-    })
-);
+const { API_PORT } = process.env;
+const port = process.env.PORT || API_PORT;
 
-api.get("/", (req, res) => {
-    res.json({ message: "ok" });
-});
-api.use("/users", usersRouter);
-/**
- * Error handler middleware
- */
-api.use((err, req, res, next) => {
-    const statusCode = err.statusCode || 500;
-    console.error(err.message, err.stack);
-    res.status(statusCode).json({ message: err.message });
-});
-
-api.listen(port, () => {
+// server listening 
+server.listen(port, () => {
     console.log(`API listening at http://localhost:${port}`);
-})
+});

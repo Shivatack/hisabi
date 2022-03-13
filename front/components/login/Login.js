@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import { API_URL } from '@env';
 
 export class Login extends React.Component {
     constructor(props) {
@@ -11,8 +12,28 @@ export class Login extends React.Component {
     }
 
     async onLoginPressed() {
-        alert(this.state.email + "\n" + this.state.password);
-        this.props.navigation.navigate('Dashboard', {})
+        let login_url = API_URL + 'login';
+        
+        await fetch(login_url, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: this.state.email,
+                password: this.state.password
+            })
+        })
+        .then((response) => response.json())
+        .then((json) => {
+            if (json.message)
+                alert(json.message);
+            else
+                this.props.navigation.navigate('Dashboard', {});
+        })
+        .catch((error) => alert(error)
+        );
     }
 
     render() {
