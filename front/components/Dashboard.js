@@ -1,8 +1,7 @@
-import React from "react";
-import Login from '../login/Login';
+import React, { Component } from "react";
 import { View, Text } from "react-native";
 
-export class Dashboard extends React.Component {
+export default class Dashboard extends Component {
     constructor(props) {
         super(props);
     }
