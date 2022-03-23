@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import MaskInput, { Masks } from 'react-native-mask-input';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Button, Text, TextInput, View } from 'react-native';
@@ -113,7 +115,7 @@ export default class Registration extends Component {
         let registration_url = API_URL + 'register';
 
         // check if fields are fully completed
-        if (!(this.state.firstname && this.state.lastname && this.state.email && this.state.password && this.state.validatepassword && this.state.birthday)) {
+        if (!(this.state.firstname && this.state.lastname && this.state.email && this.state.password && this.state.validatepassword && this.state.birthday) || this.state.firstname.trim() === "" || this.state.lastname.trim() === "") {
             alert("All fields are required!");
             return;
         }
@@ -145,104 +147,133 @@ export default class Registration extends Component {
                 alert("You must be over 18 to register!");
                 return;
         }
-        
-        alert("Everything is okay!");
 
-        // await fetch(login_url, {
-        //     method: 'POST',
-        //     headers: {
-        //         Accept: 'application/json',
-        //         'Content-Type': 'application/json'
-        //     },
-        //     body: JSON.stringify({
-        //         email: this.state.email,
-        //         password: this.state.password
-        //     })
-        // })
-        // .then((response) => response.json())
-        // .then((json) => {
-        //     if (json.message)
-        //         alert(json.message);
-        //     else
-        //         this.props.navigation.navigate('Login', {});
-        // })
-        // .catch((error) => alert(error)
-        // );
+        await fetch(registration_url, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                firstname: this.state.firstname,
+                lastname: this.state.lastname,
+                email: this.state.email,
+                password: this.state.password,
+                birthdate: this.state.birthDate
+            })
+        })
+        .then((response) => response.json())
+        .then((json) => {
+            if (json.message)
+                alert(json.message);
+            else
+                this.props.navigation.navigate('Login', {});
+        })
+        .catch((error) => alert(error)
+        );
     }
 
     render() {
         return (
-            <View style={styles.registrationcontainer}>
-                <Text style={styles.title}>Registration</Text>
-                <TextInput
-                    style={styles.textinput}
-                    placeholder='firstname'
-                    placeholderTextColor="gray"
-                    value={this.state.firstname ? this.state.firstname : null}
-                    onChangeText={(firstname) => this.setState({ firstname: firstname })}
-                />
-                <TextInput
-                    style={styles.textinput}
-                    placeholder='lastname'
-                    placeholderTextColor="gray"
-                    value={this.state.lastname ? this.state.lastname : null}
-                    onChangeText={(lastname) => this.setState({ lastname: lastname })}
-                />
-                <TextInput
-                    style={styles.textinput}
-                    placeholder='email@example.com'
-                    placeholderTextColor="gray"
-                    keyboardType='email-address'
-                    value={this.state.email ? this.state.email : null}
-                    onChangeText={(email) => this.setState({ email: email })}
-                />
-                <TextInput
-                    style={styles.textinput}
-                    secureTextEntry={true}
-                    placeholder='password'
-                    placeholderTextColor="gray"
-                    passwordRules="required: upper; required: lower; required: digit; required: special; minlength: 8;"
-                    onChangeText={(password) => this.setState({ password: password })}
-                />
-                <TextInput
-                    style={styles.textinput}
-                    secureTextEntry={true}
-                    placeholder='validate password'
-                    placeholderTextColor="gray"
-                    passwordRules="required: upper; required: lower; required: digit; required: special; minlength: 8;"
-                    onChangeText={(validatepassword) => this.setState({ validatepassword: validatepassword })}
-                />
-                <View style={styles.birthdayselect}>
-                    <MaskInput
-                        style={styles.birthdaytextinput}
-                        placeholder='select your date of birth'
-                        placeholderTextColor="gray"
-                        keyboardType='number-pad'
-                        mask={Masks.DATE_DDMMYYYY}
-                        value={this.state.birthday}
-                        clearTextOnFocus={true}
-                        onChangeText={(birthday) => this.onChangeBirthday(birthday)}
-                    />
-                    <Ionicons
-                        style={styles.calendaricon}
-                        name='md-calendar'
-                        size={32}
-                        color="black"
-                        onPress={() => this.showDatepicker()}
-                    />
-                </View>
-                {this.state.showdatepicker && (
-                    <DateTimePicker
-                        style={styles.datepicker}
-                        value={this.state.birthDate}
-                        mode={this.state.mode}
-                        onChange={(_, birthday) => this.onChangeBirthday(birthday)}
-                        dateFormat='day month year'
-                        display='spinner'
-                    />
-                )}
-                <Button onPress={() => this.onRegisterPressed()} title='Register' />
-            </View>
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+                <KeyboardAwareScrollView automaticallyAdjustContentInsets={false} enableOnAndroid={true} contentContainerStyle={{flex: 1}}>
+                    <View style={styles.registrationcontainer}>
+                        <Text style={styles.title}>Registration</Text>
+                        <TextInput
+                            style={styles.textinput}
+                            placeholder='firstname'
+                            placeholderTextColor="gray"
+                            value={this.state.firstname ? this.state.firstname : null}
+                            onChangeText={(firstname) => this.setState({ firstname: firstname })}
+                            returnKeyType="next"
+                            onSubmitEditing={() => {this.lastname.focus()}}
+                            blurOnSubmit={false}
+                        />
+                        <TextInput
+                            style={styles.textinput}
+                            placeholder='lastname'
+                            placeholderTextColor="gray"
+                            value={this.state.lastname ? this.state.lastname : null}
+                            onChangeText={(lastname) => this.setState({ lastname: lastname })}
+                            returnKeyType="next"
+                            ref={(input) => {this.lastname = input}}
+                            onSubmitEditing={() => {this.email.focus()}}
+                            blurOnSubmit={false}
+                        />
+                        <TextInput
+                            style={styles.textinput}
+                            placeholder='email@example.com'
+                            placeholderTextColor="gray"
+                            keyboardType='email-address'
+                            textContentType='emailAddress'
+                            value={this.state.email ? this.state.email : null}
+                            onChangeText={(email) => this.setState({ email: email })}
+                            returnKeyType="next"
+                            ref={(input) => {this.email = input}}
+                            onSubmitEditing={() => {this.password.focus()}}
+                            blurOnSubmit={false}
+                        />
+                        <TextInput
+                            style={styles.textinput}
+                            secureTextEntry={true}
+                            placeholder='password'
+                            placeholderTextColor="gray"
+                            textContentType='password'
+                            passwordRules="required: upper; required: lower; required: digit; required: special; minlength: 8;"
+                            onChangeText={(password) => this.setState({ password: password })}
+                            returnKeyType="next"
+                            ref={(input) => {this.password = input}}
+                            onSubmitEditing={() => {this.validatepassword.focus()}}
+                            blurOnSubmit={false}
+                        />
+                        <TextInput
+                            style={styles.textinput}
+                            secureTextEntry={true}
+                            placeholder='validate password'
+                            placeholderTextColor="gray"
+                            textContentType='password'
+                            passwordRules="required: upper; required: lower; required: digit; required: special; minlength: 8;"
+                            onChangeText={(validatepassword) => this.setState({ validatepassword: validatepassword })}
+                            returnKeyType="next"
+                            ref={(input) => {this.validatepassword = input}}
+                            onSubmitEditing={() => {this.birthday.focus()}}
+                            blurOnSubmit={false}
+                        />
+                        <View style={styles.birthdayselect}>
+                            <MaskInput
+                                style={styles.birthdaytextinput}
+                                placeholder='select your date of birth'
+                                placeholderTextColor="gray"
+                                keyboardType='number-pad'
+                                returnKeyType="done"
+                                mask={Masks.DATE_DDMMYYYY}
+                                value={this.state.birthday}
+                                clearTextOnFocus={true}
+                                onChangeText={(birthday) => this.onChangeBirthday(birthday)}
+                                ref={(input) => {this.birthday = input}}
+                            />
+                            <Ionicons
+                                style={styles.calendaricon}
+                                name='md-calendar'
+                                size={32}
+                                color="black"
+                                onPress={() => this.showDatepicker()}
+                            />
+                        </View>
+                        {this.state.showdatepicker && (
+                            <DateTimePicker
+                                style={styles.datepicker}
+                                value={this.state.birthDate}
+                                mode={this.state.mode}
+                                onChange={(_, birthday) => this.onChangeBirthday(birthday)}
+                                dateFormat='day month year'
+                                display='spinner'
+                            />
+                        )}
+                        <Button onPress={() => this.onRegisterPressed()} title='Register' />
+                    </View>
+                </KeyboardAwareScrollView>
+            </TouchableWithoutFeedback>
         );
     }
 }
